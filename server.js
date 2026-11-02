@@ -657,13 +657,18 @@ io.on('connection', (socket) => {
     currentRoomCode = roomCode;
     socket.join(roomCode);
 
+    // Start game immediately so status is 'playing'
+    game.startGame();
+
     socket.emit('room-joined', {
       player,
       roomState: game.serialize()
     });
 
-    // Start instantly!
-    game.startGame();
+    // Notify room that game has started so screen switches immediately to board
+    io.to(roomCode).emit('game-started', {
+      roomState: game.serialize()
+    });
   });
 
   // 4. Fill Bots Button in Lobby

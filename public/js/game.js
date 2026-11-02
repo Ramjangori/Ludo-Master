@@ -86,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function showScreen(screenName) {
     Object.keys(screens).forEach(key => {
       if (screens[key]) {
-        screens[key].classList.toggle('active', key === screenName);
+        const isTarget = (key === screenName);
+        screens[key].classList.toggle('active', isTarget);
+        screens[key].style.display = isTarget ? 'flex' : 'none';
       }
     });
     if (screenName === 'game' && board) {
@@ -367,6 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('turn-start', ({ currentPlayerId, turnTimeRemaining, roomState }) => {
     currentRoom = roomState;
+    if (roomState.status === 'playing') {
+      showScreen('game');
+    }
     board.updateState(roomState, localPlayer?.id);
     updateGameUI(roomState);
 
@@ -374,34 +379,42 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isMyTurn) {
       sound.playTurnAlert();
       dice.setCanRoll(true, localPlayer.color);
-      showTurnBanner('YOUR TURN! Click Dice to Roll');
+      showTurnBanner('👉 YOUR TURN! TAP THE DICE TO ROLL');
     } else {
       dice.setCanRoll(false);
       const curPlayer = roomState.players.find(p => p.id === currentPlayerId);
-      showTurnBanner(`${curPlayer?.name || 'Player'}'s turn...`);
+      showTurnBanner(`⏳ ${curPlayer?.name || 'Player'}'s turn...`);
     }
   });
 
   socket.on('dice-rolled', ({ playerId, value, validMoves, threeSixesPenalty, roomState }) => {
     currentRoom = roomState;
+    if (roomState.status === 'playing') {
+      showScreen('game');
+    }
     board.updateState(roomState, localPlayer?.id);
 
-    const rollingPlayer = roomState.players.find(p => p.id === playerId);
     const isLocal = (playerId === localPlayer?.id);
+    const rollingPlayer = roomState.players.find(p => p.id === playerId);
 
     // Animate 3D dice
     dice.animateRoll(value, () => {
       if (threeSixesPenalty) {
-        showToast('Three 6s in a row! Turn forfeited.');
+        showToast('Three 6s in a row! Turn forfeited.', true);
         return;
       }
 
       if (isLocal) {
-        if (validMoves && validMoves.length > 0) {
-          showTurnBanner('👉 CLICK YOUR BOUNCING PAWN TO MOVE!');
-        } else {
-          showTurnBanner(`Rolled ${value} - No valid moves!`);
+        if (value === 6) {
+          showToast('🎉 YOU ROLLED 6! ✨ EXTRA ROLL!');
         }
+        if (validMoves && validMoves.length > 0) {
+          showTurnBanner(`🎲 ROLLED ${value}! 👉 TAP YOUR BOUNCING PAWN TO MOVE`);
+        } else {
+          showTurnBanner(`🎲 Rolled ${value} — No valid moves for pawns.`);
+        }
+      } else {
+        showTurnBanner(`🎲 ${rollingPlayer?.name || 'Player'} rolled ${value}`);
       }
     });
   });
