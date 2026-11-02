@@ -173,10 +173,10 @@ class LudoBoard {
       const screenW = window.innerWidth;
       const screenH = window.innerHeight;
 
-      // Fit squarely within screen bounds
-      const maxW = Math.min(screenW - 24, 600);
-      const maxH = Math.min(screenH - 180, 600);
-      const size = Math.max(300, Math.min(maxW, maxH));
+      // On mobile portrait, board size must leave room for header, top row, bottom row and padding
+      const availableH = Math.max(260, screenH - 240);
+      const availableW = Math.max(260, screenW - 16);
+      const size = Math.floor(Math.min(availableW, availableH, 560));
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -197,10 +197,14 @@ class LudoBoard {
   }
 
   setupEvents() {
+    let lastTouchTime = 0;
+
     const getPos = (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = this.width / (rect.width || 1);
+      const scaleY = this.height / (rect.height || 1);
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
       return { x, y };
     };
 
@@ -215,6 +219,7 @@ class LudoBoard {
     });
 
     this.canvas.addEventListener('click', (e) => {
+      if (performance.now() - lastTouchTime < 400) return;
       const { x, y } = getPos(e);
       this.handleClick(x, y);
     });
@@ -222,10 +227,13 @@ class LudoBoard {
     // Touch support for mobile devices
     this.canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) {
+        lastTouchTime = performance.now();
         const touch = e.touches[0];
         const rect = this.canvas.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
+        const scaleX = this.width / (rect.width || 1);
+        const scaleY = this.height / (rect.height || 1);
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
         this.handleClick(x, y);
       }
     }, { passive: true });
@@ -881,17 +889,25 @@ class LudoBoard {
     const localPlayer = this.gameState.players.find(p => p.id === this.localPlayerId);
     if (!localPlayer) return;
 
+    // Generous touch hit detection: 0.8x cell size or at least 32px for fingers
+    const hitRadius = Math.max(this.cellSize * 0.85, 32);
+    let bestToken = null;
+    let minDistance = Infinity;
+
     for (const token of localPlayer.tokens) {
       if (token.renderBounds && this.validTokenMoves.includes(token.id)) {
         const dx = x - token.renderBounds.cx;
         const dy = y - token.renderBounds.cy;
-        if (Math.hypot(dx, dy) <= token.renderBounds.radius * 1.5) {
-          if (this.onTokenClick) {
-            this.onTokenClick(token.id);
-          }
-          break;
+        const dist = Math.hypot(dx, dy);
+        if (dist <= hitRadius && dist < minDistance) {
+          minDistance = dist;
+          bestToken = token;
         }
       }
+    }
+
+    if (bestToken && this.onTokenClick) {
+      this.onTokenClick(bestToken.id);
     }
   }
 }

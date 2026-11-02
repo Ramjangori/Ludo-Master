@@ -198,29 +198,42 @@
 
         </div>
 
-        <!-- Quick Chat & Emoji Reactions Bar -->
-        <div class="interactions-bar">
-          <div class="quick-reactions">
-            <button class="reaction-btn" data-emoji="😂" title="Laugh">😂</button>
-            <button class="reaction-btn" data-emoji="🔥" title="Fire">🔥</button>
-            <button class="reaction-btn" data-emoji="👑" title="Crown">👑</button>
-            <button class="reaction-btn" data-emoji="😱" title="Shocked">😱</button>
-            <button class="reaction-btn" data-emoji="🎲" title="Dice">🎲</button>
-            <button class="reaction-btn" data-emoji="👏" title="Clap">👏</button>
-            <button class="reaction-btn" data-emoji="💔" title="Broken Heart">💔</button>
-            <button class="reaction-btn" data-emoji="🎯" title="Bullseye">🎯</button>
-          </div>
+        <!-- Floating Chat Trigger Button -->
+        <button class="floating-chat-trigger" id="btn-toggle-chat" title="Chat & Emojis">
+          <span class="chat-icon">💬</span>
+          <span class="chat-badge-dot"></span>
+        </button>
 
-          <div class="quick-phrases">
-            <button class="phrase-btn">Roll a 6 please!</button>
-            <button class="phrase-btn">Good luck!</button>
-            <button class="phrase-btn">Haha, nice move!</button>
-            <button class="phrase-btn">Hurry up!</button>
-          </div>
+        <!-- Slide-Up Quick Chat Drawer Modal -->
+        <div class="chat-drawer-overlay" id="chat-drawer-overlay">
+          <div class="chat-drawer-sheet" id="chat-drawer-sheet">
+            <div class="chat-drawer-header">
+              <span class="drawer-title">👑 QUICK CHAT & REACTIONS</span>
+              <button class="btn-close-drawer" id="btn-close-chat-drawer">✕</button>
+            </div>
 
-          <div class="custom-chat-input-row">
-            <input type="text" id="chat-input-text" placeholder="Type a message to talk..." maxlength="45">
-            <button class="btn-send-chat" id="btn-send-chat">Send</button>
+            <div class="quick-reactions">
+              <button class="reaction-btn" data-emoji="😂" title="Laugh">😂</button>
+              <button class="reaction-btn" data-emoji="🔥" title="Fire">🔥</button>
+              <button class="reaction-btn" data-emoji="👑" title="Crown">👑</button>
+              <button class="reaction-btn" data-emoji="😱" title="Shocked">😱</button>
+              <button class="reaction-btn" data-emoji="🎲" title="Dice">🎲</button>
+              <button class="reaction-btn" data-emoji="👏" title="Clap">👏</button>
+              <button class="reaction-btn" data-emoji="💔" title="Broken Heart">💔</button>
+              <button class="reaction-btn" data-emoji="🎯" title="Bullseye">🎯</button>
+            </div>
+
+            <div class="quick-phrases">
+              <button class="phrase-btn">Roll a 6 please!</button>
+              <button class="phrase-btn">Good luck!</button>
+              <button class="phrase-btn">Haha, nice move!</button>
+              <button class="phrase-btn">Hurry up!</button>
+            </div>
+
+            <div class="custom-chat-input-row">
+              <input type="text" id="chat-input-text" placeholder="Type a message to talk..." maxlength="45">
+              <button class="btn-send-chat" id="btn-send-chat">Send</button>
+            </div>
           </div>
         </div>
       </main>

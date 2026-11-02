@@ -290,8 +290,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // Quick Chat & Reactions
+  // Quick Chat & Reactions Drawer
   // ==========================================
+  const chatDrawer = document.getElementById('chat-drawer-overlay');
+  const btnToggleChat = document.getElementById('btn-toggle-chat');
+  const btnCloseDrawer = document.getElementById('btn-close-chat-drawer');
+
+  function openChatDrawer() {
+    if (chatDrawer) chatDrawer.classList.add('open');
+  }
+
+  function closeChatDrawer() {
+    if (chatDrawer) chatDrawer.classList.remove('open');
+  }
+
+  if (btnToggleChat) btnToggleChat.addEventListener('click', openChatDrawer);
+  if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeChatDrawer);
+  if (chatDrawer) {
+    chatDrawer.addEventListener('click', (e) => {
+      if (e.target === chatDrawer) closeChatDrawer();
+    });
+  }
+
   const quickReactions = document.querySelectorAll('.reaction-btn');
   quickReactions.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -299,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (emoji) {
         sound.playClick();
         socket.emit('send-reaction', { emoji });
+        closeChatDrawer();
       }
     });
   });
@@ -310,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (phrase) {
         sound.playClick();
         socket.emit('send-chat', { phrase });
+        closeChatDrawer();
       }
     });
   });
@@ -324,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.emit('send-chat', { message: text });
     chatInput.value = '';
     sound.playClick();
+    closeChatDrawer();
   }
 
   if (btnSendChat) btnSendChat.addEventListener('click', sendChatMessage);
@@ -399,13 +422,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (roomState.status === 'playing') {
       showScreen('game');
     }
-    board.updateState(roomState, localPlayer?.id);
 
     const isLocal = (playerId === localPlayer?.id);
     const rollingPlayer = roomState.players.find(p => p.id === playerId);
 
-    // Animate 3D dice
+    // Keep valid moves empty until dice finishes landing to prevent premature goti clicks!
+    board.validTokenMoves = [];
+    board.updateState(roomState, localPlayer?.id);
+    board.validTokenMoves = [];
+
+    // Animate dice and settle on the exact value
     dice.animateRoll(value, () => {
+      // NOW activate valid moves on the board
+      board.validTokenMoves = validMoves || [];
+
       if (threeSixesPenalty) {
         showToast('Three 6s in a row! Turn forfeited.', true);
         return;
@@ -415,10 +445,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (value === 6) {
           showToast('🎉 YOU ROLLED 6! ✨ EXTRA ROLL!');
         }
-        if (validMoves && validMoves.length > 0) {
-          showTurnBanner(`🎲 ROLLED ${value}! 👉 TAP YOUR BOUNCING PAWN TO MOVE`);
+
+        if (validMoves && validMoves.length === 1) {
+          // Authentic Ludo King feature: single valid move automatically hops!
+          showTurnBanner(`🎲 ROLLED ${value}! Moving goti...`);
+          setTimeout(() => {
+            socket.emit('move-token', { tokenId: validMoves[0] });
+          }, 320);
+        } else if (validMoves && validMoves.length > 1) {
+          showTurnBanner(`🎲 ROLLED ${value}! 👉 TAP YOUR BOUNCING GOTI TO MOVE`);
         } else {
-          showTurnBanner(`🎲 Rolled ${value} — No valid moves for pawns.`);
+          showTurnBanner(`🎲 Rolled ${value} — No valid moves for goti.`);
         }
       } else {
         showTurnBanner(`🎲 ${rollingPlayer?.name || 'Player'} rolled ${value}`);
