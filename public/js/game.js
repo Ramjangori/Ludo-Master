@@ -6,10 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function getServerUrl() {
     const saved = localStorage.getItem('ludo_server_url');
     if (saved) return saved;
-    if (window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '')) {
-      return 'http://10.0.2.2:3000'; // Default Android emulator host loopback
+    // When running inside Android Native App or standalone, connect to live Render cloud server
+    if (window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '') || (typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform && Capacitor.isNativePlatform())) {
+      return 'https://ludo-master-9vnk.onrender.com';
     }
-    return undefined; // Connects to origin automatically
+    // If opened on localhost in browser, connect to local port
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return undefined; // uses current origin
+    }
+    return 'https://ludo-master-9vnk.onrender.com';
   }
 
   const serverUrl = getServerUrl();
