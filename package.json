@@ -1,0 +1,32 @@
+{
+  "name": "ludo-voice-game",
+  "version": "1.0.0",
+  "description": "Ludo King with Real-Time WebRTC Peer-to-Peer Voice Chat & AI Bots",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/rules_test.js && node test/gameplay_test.js"
+  },
+  "keywords": [
+    "ludo",
+    "ludo-king",
+    "webrtc",
+    "voice-chat",
+    "socketio",
+    "multiplayer",
+    "game"
+  ],
+  "author": "Moh Ramjan",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "express": "^5.3.0",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
+}

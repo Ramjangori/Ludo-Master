@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ludo King Voice</string>
+    <string name="title_activity_main">Ludo King Voice</string>
+    <string name="package_name">com.ludovoice.king</string>
+    <string name="custom_url_scheme">com.ludovoice.king</string>
+</resources>
