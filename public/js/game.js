@@ -84,13 +84,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Screen Switching
   // ==========================================
   function showScreen(screenName) {
-    Object.keys(screens).forEach(key => {
-      if (screens[key]) {
-        const isTarget = (key === screenName);
-        screens[key].classList.toggle('active', isTarget);
-        screens[key].style.display = isTarget ? 'flex' : 'none';
-      }
+    const allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(el => {
+      el.classList.remove('active');
+      el.style.display = 'none';
     });
+
+    const target = document.getElementById(`screen-${screenName}`);
+    if (target) {
+      target.classList.add('active');
+      target.style.display = 'flex';
+    }
+
     if (screenName === 'game' && board) {
       setTimeout(() => {
         board.resize();
@@ -134,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-quick-play').addEventListener('click', () => {
     sound.init();
     sound.playClick();
+    showScreen('game'); // Immediately transition to game arena!
     const name = getPlayerName();
     socket.emit('quick-play-bots', {
       playerName: name,
@@ -226,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-start-game')?.addEventListener('click', () => {
     sound.playClick();
+    showScreen('game'); // Immediately transition from lobby to game arena!
     socket.emit('start-game');
   });
 
