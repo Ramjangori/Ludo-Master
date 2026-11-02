@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ludo King with Real-Time Voice Chat</title>
+  <link rel="stylesheet" href="style.css?v=2.5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: HOME / WELCOME SCREEN -->
+    <!-- ========================================== -->
+    <section class="screen active" id="screen-home">
+      <div class="home-card">
+        <div class="logo-header">
+          <div class="crown-icon">👑</div>
+          <h1 class="game-title">LUDO KING</h1>
+          <div class="voice-badge">
+            <span class="live-dot"></span>
+            <span>REAL-TIME VOICE CHAT</span>
+          </div>
+          <div class="server-status-pill" id="btn-open-server-settings" title="Configure Multiplayer Server">
+            <span>🌐 Server: <strong id="server-status-label">Auto</strong></span>
+            <span class="gear-icon">⚙️</span>
+          </div>
+        </div>
+
+        <p class="tagline">Play authentic Ludo King with friends & talk live over crystal-clear voice!</p>
+
+        <!-- Player Profile Setup -->
+        <div class="profile-setup">
+          <label class="input-label">Choose Your Royal Avatar</label>
+          <div class="avatar-selector">
+            <button class="avatar-option selected" data-avatar="👑">👑</button>
+            <button class="avatar-option" data-avatar="👸">👸</button>
+            <button class="avatar-option" data-avatar="🧙‍♂️">🧙‍♂️</button>
+            <button class="avatar-option" data-avatar="🦁">🦁</button>
+            <button class="avatar-option" data-avatar="🐉">🐉</button>
+            <button class="avatar-option" data-avatar="🤖">🤖</button>
+            <button class="avatar-option" data-avatar="🥷">🥷</button>
+            <button class="avatar-option" data-avatar="🦄">🦄</button>
+          </div>
+
+          <label class="input-label" for="player-name-input">Your Display Name</label>
+          <input type="text" id="player-name-input" class="text-input" placeholder="Enter your name..." maxlength="14" value="King_Player">
+        </div>
+
+        <!-- Play Modes -->
+        <div class="play-modes">
+          <button class="mode-btn btn-primary" id="btn-quick-play">
+            <span class="btn-emoji">⚡</span>
+            <div class="btn-text">
+              <span class="btn-title">Quick Play vs AI Bots</span>
+              <span class="btn-sub">Instant solo game with smart bots</span>
+            </div>
+          </button>
+
+          <div class="mode-divider">
+            <span>OR PLAY WITH FRIENDS & VOICE</span>
+          </div>
+
+          <div class="friends-options">
+            <!-- Create Room -->
+            <div class="room-action-card">
+              <h3>Create Private Room</h3>
+              <p>Host a room with in-game voice chat & invite friends.</p>
+              <div class="room-options-row">
+                <label for="create-players-count">Max Players:</label>
+                <select id="create-players-count" class="select-input">
+                  <option value="4" selected>4 Players</option>
+                  <option value="3">3 Players</option>
+                  <option value="2">2 Players</option>
+                </select>
+              </div>
+              <button class="action-btn btn-gold" id="btn-create-room">Create Room & Talk</button>
+            </div>
+
+            <!-- Join Room -->
+            <div class="room-action-card">
+              <h3>Join with Room Code</h3>
+              <p>Enter the 6-character code sent by your friend.</p>
+              <input type="text" id="join-code-input" class="text-input code-input" placeholder="e.g. 7K4X9B" maxlength="6">
+              <button class="action-btn btn-green" id="btn-join-room">Join Room</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: MULTIPLAYER LOBBY -->
+    <!-- ========================================== -->
+    <section class="screen" id="screen-lobby">
+      <div class="lobby-card">
+        <div class="lobby-header">
+          <h2>Royal Match Lobby</h2>
+          <div class="room-code-box">
+            <span class="code-label">ROOM CODE:</span>
+            <span class="code-value" id="lobby-room-code">------</span>
+            <button class="icon-btn-small" id="btn-copy-code" title="Copy Room Code">📋</button>
+          </div>
+        </div>
+
+        <div class="lobby-share-banner">
+          <p>Share this link with your friends to join voice and play:</p>
+          <button class="share-link-btn" id="btn-copy-link">🔗 Copy Invite Link</button>
+        </div>
+
+        <div class="lobby-players-grid" id="lobby-players-list">
+          <!-- Filled dynamically -->
+        </div>
+
+        <div class="lobby-actions">
+          <button class="action-btn btn-secondary" id="btn-add-bots">🤖 Fill with AI Bots</button>
+          <button class="action-btn btn-gold" id="btn-start-game">Start Royal Match</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 3: AUTHENTIC LUDO KING BOARD & VOICE -->
+    <!-- ========================================== -->
+    <section class="screen" id="screen-game">
+      <!-- Top Voice & System Control Bar -->
+      <header class="game-top-bar">
+        <div class="room-badge">
+          <span class="crown">👑</span>
+          <span>Room: <strong id="game-room-code">------</strong></span>
+        </div>
+
+        <!-- Voice Chat Controls -->
+        <div class="voice-toolbar">
+          <button class="voice-btn" id="btn-toggle-mic" title="Toggle Microphone">
+            <span class="btn-icon">🎙️</span>
+            <span class="btn-label">Mic</span>
+          </button>
+
+          <button class="voice-btn" id="btn-toggle-deafen" title="Deafen / Mute incoming voice">
+            <span class="btn-icon">🎧</span>
+            <span class="btn-label">Deafen</span>
+          </button>
+
+          <button class="voice-btn ptt-btn" id="btn-voice-ptt" title="Push-to-Talk (Hold Spacebar)">
+            <span class="btn-icon">⌨️</span>
+            <span class="btn-label">PTT</span>
+          </button>
+
+          <!-- Voice visualizer level -->
+          <div class="voice-level-meter" title="Mic Volume Level">
+            <div class="voice-level-bar" id="voice-level-bar"></div>
+          </div>
+
+          <span class="voice-status" id="voice-status-text">Voice: Active</span>
+        </div>
+
+        <!-- Game Sound & Settings -->
+        <div class="system-controls">
+          <button class="icon-btn" id="btn-toggle-sound" title="Toggle Sound FX">
+            <span class="btn-icon">🔊</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Ludo King Arena -->
+      <main class="game-arena">
+        <div class="ludo-king-table">
+
+          <!-- Top Row: Red Player (Left), Status Banner (Center), Green Player (Right) -->
+          <div class="table-row top-row">
+            <div class="corner-player-slot" id="slot-red"></div>
+            <div class="turn-banner-slot">
+              <div class="turn-banner" id="turn-status-banner">🎲 Welcome to Ludo King!</div>
+            </div>
+            <div class="corner-player-slot" id="slot-green"></div>
+          </div>
+
+          <!-- Middle: Canvas Board -->
+          <div class="table-middle">
+            <div class="board-canvas-container">
+              <canvas id="board-canvas" width="600" height="600"></canvas>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Blue Player (Left), 3D Dice Cup (Center), Yellow Player (Right) -->
+          <div class="table-row bottom-row">
+            <div class="corner-player-slot" id="slot-blue"></div>
+            <div class="table-dice-center">
+              <div class="floating-dice-container" id="dice-container"></div>
+              <div class="dice-instruction" id="dice-instruction">CLICK DICE TO ROLL</div>
+            </div>
+            <div class="corner-player-slot" id="slot-yellow"></div>
+          </div>
+
+        </div>
+
+        <!-- Quick Chat & Emoji Reactions Bar -->
+        <div class="interactions-bar">
+          <div class="quick-reactions">
+            <button class="reaction-btn" data-emoji="😂" title="Laugh">😂</button>
+            <button class="reaction-btn" data-emoji="🔥" title="Fire">🔥</button>
+            <button class="reaction-btn" data-emoji="👑" title="Crown">👑</button>
+            <button class="reaction-btn" data-emoji="😱" title="Shocked">😱</button>
+            <button class="reaction-btn" data-emoji="🎲" title="Dice">🎲</button>
+            <button class="reaction-btn" data-emoji="👏" title="Clap">👏</button>
+            <button class="reaction-btn" data-emoji="💔" title="Broken Heart">💔</button>
+            <button class="reaction-btn" data-emoji="🎯" title="Bullseye">🎯</button>
+          </div>
+
+          <div class="quick-phrases">
+            <button class="phrase-btn">Roll a 6 please!</button>
+            <button class="phrase-btn">Good luck!</button>
+            <button class="phrase-btn">Haha, nice move!</button>
+            <button class="phrase-btn">Hurry up!</button>
+          </div>
+
+          <div class="custom-chat-input-row">
+            <input type="text" id="chat-input-text" placeholder="Type a message to talk..." maxlength="45">
+            <button class="btn-send-chat" id="btn-send-chat">Send</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- In-Game Floating Chat Messages Stream -->
+      <div class="chat-messages-stream" id="chat-messages"></div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODAL: GAME OVER & PODIUM -->
+    <!-- ========================================== -->
+    <div class="modal" id="modal-gameover">
+      <div class="modal-content victory-card">
+        <div class="victory-header">
+          <div class="victory-trophy">🏆</div>
+          <h2>ROYAL VICTORY!</h2>
+          <p>The match has concluded.</p>
+        </div>
+
+        <div class="podium-grid" id="podium-container">
+          <!-- Filled dynamically -->
+        </div>
+
+        <div class="modal-buttons">
+          <button class="action-btn btn-gold" id="btn-play-again">Play Again</button>
+          <button class="action-btn btn-secondary" id="btn-return-lobby">Return to Home</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: PLAYER VOLUME CONTROLLER -->
+    <!-- ========================================== -->
+    <div class="modal" id="modal-player-volume">
+      <div class="modal-content volume-popup">
+        <h3 id="vol-player-name">Player Volume</h3>
+        <p>Adjust voice volume for this player:</p>
+        <div class="volume-slider-row">
+          <span>🔈</span>
+          <input type="range" id="vol-slider" min="0" max="150" value="100">
+          <span>🔊</span>
+        </div>
+        <button class="action-btn btn-secondary" id="btn-close-volume">Done</button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: SERVER SETTINGS -->
+    <!-- ========================================== -->
+    <div class="modal" id="modal-server-settings">
+      <div class="modal-content volume-popup">
+        <h3>Multiplayer Server URL</h3>
+        <p>Set your deployed backend server address (for Android & Web):</p>
+        <input type="text" id="input-server-url" class="text-input" placeholder="e.g. https://your-server.onrender.com" style="margin: 16px 0; font-size: 14px; text-align: left;">
+        <div class="modal-buttons">
+          <button class="action-btn btn-gold" id="btn-save-server-url">Save & Reconnect</button>
+          <button class="action-btn btn-secondary" id="btn-close-server-settings">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/socket.io.min.js"></script>
+  <script src="js/sound.js?v=2.5"></script>
+  <script src="js/voice.js?v=2.5"></script>
+  <script src="js/dice.js?v=2.5"></script>
+  <script src="js/board.js?v=2.5"></script>
+  <script src="js/game.js?v=2.5"></script>
+</body>
+</html>

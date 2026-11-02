@@ -1,0 +1,12 @@
+{
+	"appId": "com.ludovoice.king",
+	"appName": "Ludo King Voice",
+	"webDir": "public",
+	"server": {
+		"androidScheme": "https",
+		"cleartext": true
+	},
+	"android": {
+		"allowMixedContent": true
+	}
+}

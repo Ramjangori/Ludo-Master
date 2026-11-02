@@ -48,15 +48,7 @@ jobs:
       - name: Build Android Debug APK
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee ../build.log
-          EXIT_CODE=${PIPESTATUS[0]}
-          if [ $EXIT_CODE -ne 0 ]; then
-            echo "## ❌ Android Debug Build Failed" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 80 ../build.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit $EXIT_CODE
-          fi
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Build Android Release AAB (Google Play Store)
         continue-on-error: true
@@ -77,20 +69,6 @@ jobs:
         with:
           name: ludo-voice-king-aab
           path: android/app/build/outputs/bundle/release/*.aab
-
-      - name: Publish Failure Log to Release
-        if: failure()
-        continue-on-error: true
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: build-failure-log
-          name: "Build Failure Log"
-          body_path: build.log
-          draft: false
-          prerelease: false
-          files: build.log
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release with APK
         if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
