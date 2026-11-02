@@ -24,10 +24,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Android SDK Tools & Licenses
+      - name: Set up Android SDK Tools & API 36
         run: |
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -78,15 +78,22 @@ jobs:
           name: ludo-voice-king-aab
           path: android/app/build/outputs/bundle/release/*.aab
 
-      - name: Upload Build Log on Failure
+      - name: Publish Failure Log to Release
         if: failure()
-        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
         with:
-          name: gradle-build-log
-          path: build.log
+          tag_name: build-failure-log
+          name: "Build Failure Log"
+          body_path: build.log
+          draft: false
+          prerelease: false
+          files: build.log
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release with APK
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: success() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
